@@ -28,12 +28,13 @@ any action.
 |-|-|-|-|
 | plan_json_file | Yes | | The path to the terraform plan in the JSON format, generated using `terraform show --json <plan_file>`. This can be the result of a task or the use of `ljfranklin/terraform-resource` |
 
-The version emitted from out is a `base64` representation of the terraform changeset
-in the markdown table format, comprising of the resources that are being created, modified or removed.
+The version emitted from out is a `base64` representation of the comment posted to Github Pull Request.
+in the markdown table format, comprising of the resources that are being created, modified or removed and an expandable description of
+the attributes that are changed for each resource.
 
 ### `get`
 
-The base64 representation of the terraform changeset is decoded and written to a file called `state_changes.md`
+The base64 representation of the comment URL is decoded and written to a file called `state_changes.md`
 under the resource directory.
 
 ## Example
