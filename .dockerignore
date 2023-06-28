@@ -1,0 +1,16 @@
+# Ignore everything by default.
+*
+
+# Explicitly define directories and files to pass into docker.
+!/full
+!/.python-version
+!/db
+!/docker
+!/alembic.ini
+!/LICENSE
+!/makefile
+!/pyproject.toml
+!/README.md
+!/setup.*
+!/requirements*
+!/concourse_terraform_plan_pr_reporter_resource

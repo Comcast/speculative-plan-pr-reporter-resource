@@ -1,0 +1,17 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: python
+    tag: 3.11.1
+
+inputs:
+  - name: source-code
+
+run:
+  path: /bin/sh
+  args: [source-code/ci/tasks/unit-tests.sh, source-code] # Second argument is the working dir for unit-tests.sh
+
+params:
+  USE_SYSTEM_PYTHON: true

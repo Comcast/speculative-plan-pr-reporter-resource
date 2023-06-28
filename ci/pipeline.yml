@@ -1,0 +1,79 @@
+resource_types:
+  - name: pull-request
+    type: docker-image
+    source:
+      repository: teliaoss/github-pr-resource
+
+resources:
+  - name: source-code
+    type: git
+    source:
+      uri: https://github.com/comcast-devx-cd/concourse-terraform-plan-pr-reporter-resource.git
+      branch: main
+      username: ((git.username))
+      password: ((git.personal_access_token))
+
+  - name: resource-container-image
+    type: docker-image
+    source:
+      username: ((atlas.username))
+      password: ((atlas.password))
+      repository: hub.comcast.net/devx-delivery-cd/terraform-plan-pr-reporter-resource
+
+  - name: release-resource
+    type: github-release
+    check_every: 100h
+    webhook_token: ((secrets.ghec_release_hook_token))
+    source:
+      owner: comcast-devx-cd
+      repository: concourse-terraform-plan-pr-reporter-resource
+      access_token: ((git.personal_access_token))      
+
+  - name: source-pull-request
+    type: pull-request
+    check_every: 24h
+    webhook_token: ((git.webhook_token))
+    source:
+      repository: comcast-devx-cd/concourse-terraform-plan-pr-reporter-resource
+      v3_endpoint: https://api.github.com/
+      v4_endpoint: https://api.github.com/graphql
+      access_token: ((git.personal_access_token))
+
+jobs:
+  
+  - name: set-pipeline
+    public: true
+    plan:
+      - get: source-code
+        trigger: true
+      - get: source-pull-request
+        version: every
+      - set_pipeline: concourse-terraform-plan-pr-reporter-resource
+        file: source-code/ci/pipeline.yml
+
+  - name: pr-pipeline
+    plan:
+      - get: source-pull-request
+        trigger: true
+      - task: run-unit-tests
+        input_mapping: {source-code: source-pull-request}
+        file: source-pull-request/ci/tasks/unit-tests.yml
+
+  - name: main-branch #
+    plan:
+      - get: source-code
+      - task: run-unit-tests
+        privileged: true
+        input_mapping: { source-code: source-code }
+        file: source-code/ci/tasks/unit-tests.yml
+
+  - name: publish
+    serial: true
+    plan:
+      - get: source-code
+      - get: release-resource
+        trigger: true
+      - put: resource-container-image
+        params:
+          tag_file: release-resource/version
+          build: source-code
