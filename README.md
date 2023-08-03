@@ -6,6 +6,8 @@ Written in Python, it currently supports publishing the report of changes as a t
 by taking advantage of the [telia-oss/github-pr-resource](https://github.com/telia-oss/github-pr-resource)
 to fetch metadata for the PR.
 
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+
 ## Source Configuration
 
 | Parameter | Required | Default | Description |
@@ -24,6 +26,8 @@ any action.
 
 ### `put`
 
+#### Parameters
+
 | Parameter | Required | Default | Description |
 |-|-|-|-|
 | plan_json_file | Yes | | The path to the terraform plan in the JSON format, generated using `terraform show --json <plan_file>`. This can be the result of a task or the use of `ljfranklin/terraform-resource` |
@@ -34,7 +38,7 @@ the attributes that are changed for each resource.
 
 ### `get`
 
-The base64 representation of the comment URL is decoded and written to a file called `state_changes.md`
+The base64 representation of the comment URL is decoded and written to a file called `comment_url.txt`
 under the resource directory.
 
 ## Example
@@ -115,3 +119,38 @@ jobs:
     params:
       plan_json_file: "deve-env-terraform/plan.json"
 ```
+
+## Development
+
+Prerequisites:
+* python is required - version 3.11.1 is tested; earlier versions (3.x.x) may also work
+* docker is required for buidling the resource.
+
+To use the newly built image, push it to a docker registry that's accessible to
+Concourse and configure your pipeline to use it:
+Make sure to [force-recheck the resource type](https://concourse-ci.org/managing-resource-types.html#fly-check-resource-type) for the new changes to reflect
+
+### Makefile
+
+A lot of useful make directives are provided. 
+
+- To initialize the project, run `make all`.
+- To format the code base, run `make pretty`.
+
+### Building Docker image
+
+Make directives are provided to aide with both local testing of the resource and pushing the resource to a docker registry.
+Edit the `DOCKER_IMAGE_TAG` at the top of the `makefile`.
+
+- `make docker-build` To build the image.
+- `make docker-local` To test the image locally for `out` with a sample input.
+- `make docker-push` To push the image to a docker registry.
+
+
+Please make sure the user is authenticated against the respective docker registry.
+
+The build image has to be pushed to registry before using the same in concourse. 
+
+## LICENSE
+
+This project is licensed under the terms of the Apache 2.0 open source license. Please refer to [LICENSE](./LICENSE) for the full terms.

@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 PACKAGE_SLUG=concourse_terraform_plan_pr_reporter_resource
-DOCKER_IMAGE_TAG=hub.comcast.net/devx-delivery-cd/terraform-plan-pr-reporter-resource
+DOCKER_IMAGE_TAG=<docker-registry>/terraform-plan-pr-reporter-resource:<tag>
 ifdef CI
 	PYTHON_PYENV :=
 	PYTHON_VERSION := $(shell python --version|cut -d" " -f2)
@@ -122,7 +122,15 @@ requirements.txt: $(PACKAGE_CHECK) pyproject.toml
 requirements-dev.txt: $(PACKAGE_CHECK) pyproject.toml
 	$(PYTHON) -m piptools compile --resolver=backtracking --upgrade --output-file=requirements-dev.txt --extra=dev pyproject.toml
 
+#
+# Licenses
+#
+.PHONY: python-licenses
+python-licenses:
+	$(PYTHON) -m reuse annotate --year 2023 --copyright "Comcast Cable Communications Management, LLC" --recursive --template=python-header --copyright-style string --skip-unrecognised ./**/*.py
 
+.PHONY: licences
+licenses: python-licenses
 
 #
 # Packaging
