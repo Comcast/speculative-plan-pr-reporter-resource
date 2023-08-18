@@ -49,7 +49,9 @@ resource_types:
 - name: terraform-plan-gh-pr-resource
   type: docker-image
   source:
-    repository: <docker-registry-namespace>/terraform-plan-pr-reporter-resource # Registry URL and namespace where the resource image is pushed to. The image can be generated using the `Dockerfile`.
+    # Registry URL and namespace where the resource image is pushed to. The image can be generated using the `Dockerfile`.
+    repository: hub.comcast.net/devx-delivery-cd/terraform-plan-pr-reporter-resource
+    tag: 1.0.0
 
 - name: pull-request
   type: registry-image
