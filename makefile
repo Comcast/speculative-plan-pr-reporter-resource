@@ -1,5 +1,6 @@
 SHELL := /bin/bash
 PACKAGE_SLUG=concourse_terraform_plan_pr_reporter_resource
+DOCKER_IMAGE_TAG=<docker-registry>/terraform-plan-pr-reporter-resource:<tag>
 ifdef CI
 	PYTHON_PYENV :=
 	PYTHON_VERSION := $(shell python --version|cut -d" " -f2)
@@ -82,7 +83,7 @@ pytest:
 
 .PHONY: pytest_loud
 pytest_loud:
-	$(PYTHON) -m pytest -s --cov=./${PACKAGE_SLUG} --cov-report=term-missing tests
+	$(PYTHON) -m pytest -s --log-level=INFO --cov=./${PACKAGE_SLUG} --cov-report=term-missing tests
 
 .PHONY: isort_check
 isort_check:
@@ -121,7 +122,15 @@ requirements.txt: $(PACKAGE_CHECK) pyproject.toml
 requirements-dev.txt: $(PACKAGE_CHECK) pyproject.toml
 	$(PYTHON) -m piptools compile --resolver=backtracking --upgrade --output-file=requirements-dev.txt --extra=dev pyproject.toml
 
+#
+# Licenses
+#
+.PHONY: python-licenses
+python-licenses:
+	$(PYTHON) -m reuse annotate --year 2023 --copyright "Comcast Cable Communications Management, LLC" --recursive --template=python-header --copyright-style string --skip-unrecognised ./**/*.py
 
+.PHONY: licences
+licenses: python-licenses
 
 #
 # Packaging
@@ -130,3 +139,16 @@ requirements-dev.txt: $(PACKAGE_CHECK) pyproject.toml
 .PHONY: build
 build: $(PACKAGE_CHECK)
 	$(PYTHON) -m build
+
+
+.PHONY: docker-build
+docker-build:
+	docker build --build-arg="PYTHON_VERSION=${PYTHON_VERSION}" -t ${DOCKER_IMAGE_TAG} .
+
+.PHONY: docker-run-local
+docker-local: docker-build
+	docker run --rm -i -v "${PWD}:${PWD}" -w "${PWD}" ${DOCKER_IMAGE_TAG} /opt/resource/out . < tests/resources/test-input.json
+
+.PHONY: docker-push
+docker-push: docker-build
+	docker push ${DOCKER_IMAGE_TAG}

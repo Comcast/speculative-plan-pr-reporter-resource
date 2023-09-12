@@ -12,6 +12,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .conf.settings import Settings
+import logging
 
-settings = Settings()
+logging.basicConfig(
+    format="%(levelname) -5s %(asctime)s %(funcName)- -20s: %(message)s",
+    datefmt="%d-%b-%y %H:%M:%S",
+    level=logging.INFO,
+)
+logger = logging.getLogger("resourceLogger")

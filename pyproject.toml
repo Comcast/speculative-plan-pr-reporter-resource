@@ -4,12 +4,15 @@ requires = ["setuptools>=67.0", "setuptools_scm[toml]>=7.1"]
 
 [project]
 authors = [{"name" = "DevX CD"}]
-description = "A Concourse resource to read a speculative terraform plan and post a comment to a Github Pull Request with the changes that will be applied by the plan"
+description = "A Concourse resource to generate a report from a speculative terraform plan."
 dynamic = ["version", "readme"]
 license = {"file" = "LICENSE"}
 name = "concourse_terraform_plan_pr_reporter_resource"
 dependencies = [
-  "pydantic"
+  "markdown-table-generator",
+  "pydantic",
+  "requests",
+  "terraformer"
 ]
 
 [project.optional-dependencies]
@@ -54,6 +57,11 @@ target-version = ['py38', 'py39', 'py310', 'py311']
 profile = "black"
 skip = [".venv"]
 src_paths = ["concourse_terraform_plan_pr_reporter_resource", "tests"]
+
+[tool.pytest.ini_options]
+pythonpath = [
+  "concourse_terraform_plan_pr_reporter_resource"
+]
 
 [tool.setuptools.dynamic]
 readme = {file = ["README.md"]}

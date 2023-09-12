@@ -1,0 +1,8 @@
+{
+  "source": {
+    "gh_token": "some_token"
+  },
+  "params": {
+    "plan_json_file": "tests/resources/terraform-plans/plan.json"
+  }
+}

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 # Copyright 2023 Comcast Cable Communications Management, LLC
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,6 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from .conf.settings import Settings
+import sys
 
-settings = Settings()
+# check is currently a no-op
+# Valid payload to keep Concourse happy.
+print("[]", file=sys.stdout)
